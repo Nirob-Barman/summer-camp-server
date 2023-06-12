@@ -34,10 +34,10 @@ async function run() {
 
         // create a collection with users
 
-        // app.get('/users', async (req, res) => {
-        //     const result = await usersCollection.find().toArray();
-        //     res.send(result);
-        // });
+        app.get('/users', async (req, res) => {
+            const result = await usersCollection.find().toArray();
+            res.send(result);
+        });
 
         app.post('/users', async (req, res) => {
             const user = req.body;
