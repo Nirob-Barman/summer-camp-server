@@ -34,10 +34,21 @@ async function run() {
 
         // create a collection with users
 
+        // app.get('/users', async (req, res) => {
+        //     const result = await usersCollection.find().toArray();
+        //     res.send(result);
+        // });
+
         app.get('/users', async (req, res) => {
-            const result = await usersCollection.find().toArray();
-            res.send(result);
+            try {
+                const result = await usersCollection.find().toArray();
+                res.send(result);
+            } catch (err) {
+                console.error('Error retrieving users:', err);
+                res.status(500).send('Internal Server Error');
+            }
         });
+
 
         app.post('/users', async (req, res) => {
             const user = req.body;
