@@ -42,6 +42,15 @@ async function run() {
 
         // create a collection with users
 
+        
+        app.get("/users/:email", async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const result = await usersCollection.findOne(query);
+            console.log(result);
+            res.send(result);
+        });
+
         // app.get('/users', async (req, res) => {
         //     const result = await usersCollection.find().toArray();
         //     res.send(result);
