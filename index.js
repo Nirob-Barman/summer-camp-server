@@ -42,7 +42,20 @@ async function run() {
 
         // create a collection with users
 
-        
+        // Save user data and role in the Database
+        app.put("/users/:email", async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const query = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await usersCollection.updateOne(query, updateDoc, options);
+            console.log(result);
+            res.send(result);
+        });
+
         app.get("/users/:email", async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
