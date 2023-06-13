@@ -94,6 +94,62 @@ async function run() {
         });
 
 
+        // create a collection with classes
+
+        app.get('/classes', async (req, res) => {
+            const result = await classesCollection.find().toArray()
+            res.send(result)
+        })
+
+
+        app.delete('/classes/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await classesCollection.deleteOne(query)
+            res.send(result)
+        })
+
+        app.get('/classes/:email', async (req, res) => {
+            const email = req.params.email
+            const query = { 'instructorEmail': email }
+            const result = await classesCollection.find(query).toArray()
+
+            console.log(result)
+            res.send(result)
+        })
+
+        app.get("/classes/:id", async (req, res) => {
+            const id = req.params.id;
+
+            const filter = { _id: new ObjectId(id) };
+
+            const data = await classesCollection.findOne(filter);
+
+            res.send(data);
+        });
+
+        app.patch('/classes/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    status: 'approved'
+                },
+            };
+
+            const result = await classesCollection.updateOne(filter, updateDoc);
+            res.send(result);
+
+        })
+
+        // Save a class in database
+        app.post('/classes', async (req, res) => {
+            const classData = req.body
+            console.log(classData)
+            const result = await classesCollection.insertOne(classData)
+            res.send(result)
+        })
 
 
         // Send a ping to confirm a successful connection
