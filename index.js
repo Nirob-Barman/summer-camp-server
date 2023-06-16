@@ -111,14 +111,14 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/classes/:email', async (req, res) => {
-            const email = req.params.email
-            const query = { 'InstructorEmail': email }
-            const result = await classesCollection.find(query).toArray()
+        app.get("/classes/:email", async (req, res) => {
+            const email = req.params.email;
+            const query = { instructorEmail: email };
+            const result = await classesCollection.find(query).toArray();
 
-            console.log(result)
-            res.send(result)
-        })
+            console.log(result);
+            res.send(result);
+        });
 
         app.get("/classes/:id", async (req, res) => {
             const id = req.params.id;
