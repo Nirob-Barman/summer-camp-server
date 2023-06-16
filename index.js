@@ -1,8 +1,7 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const cors = require('cors');
-// const jwt = require('jsonwebtoken');
-require('dotenv').config()
+const cors = require("cors");
+require("dotenv").config();
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -11,12 +10,11 @@ const corsOptions = {
     credentials: true,
     optionSuccessStatus: 200,
 };
-
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xceqs5c.mongodb.net/?retryWrites=true&w=majority`;
 
 
@@ -39,9 +37,10 @@ async function run() {
         const bookingsCollection = client.db("campDb").collection("bookings");
 
 
-        // create a collection with users
 
-        // Save user data and role in the Database
+
+        // create a collection of users
+
         app.put("/users/:email", async (req, res) => {
             const email = req.params.email;
             const user = req.body;
@@ -55,6 +54,8 @@ async function run() {
             res.send(result);
         });
 
+
+
         app.get("/users/:email", async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
@@ -63,53 +64,38 @@ async function run() {
             res.send(result);
         });
 
-        // app.get('/users', async (req, res) => {
-        //     const result = await usersCollection.find().toArray();
-        //     res.send(result);
-        // });
-
-        app.get('/users', async (req, res) => {
-            try {
-                const result = await usersCollection.find().toArray();
-                res.send(result);
-            } catch (err) {
-                console.error('Error retrieving users:', err);
-                res.status(500).send('Internal Server Error');
-            }
-        });
 
 
-        app.post('/users', async (req, res) => {
-            const user = req.body;
-            console.log(user);
-            const query = { email: user.email }
-            const existingUser = await usersCollection.findOne(query);
-
-            if (existingUser) {
-                return res.send({ message: 'user already exists' })
-            }
-
-            const result = await usersCollection.insertOne(user);
+        app.get("/users", async (req, res) => {
+            const user = usersCollection.find();
+            const result = await user.toArray();
             res.send(result);
         });
 
 
 
 
+
+
         // create a collection with classes
 
-        app.get('/classes', async (req, res) => {
-            const result = await classesCollection.find().toArray()
-            res.send(result)
-        })
+
+        app.get("/classes", async (req, res) => {
+            const result = await classesCollection.find().toArray();
+            // const result = await classesCollection.find().sort({availableSeats: -1}).toArray();
+            res.send(result);
+        });
 
 
-        app.delete('/classes/:id', async (req, res) => {
-            const id = req.params.id
-            const query = { _id: new ObjectId(id) }
-            const result = await classesCollection.deleteOne(query)
-            res.send(result)
-        })
+
+        app.delete("/classes/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await classesCollection.deleteOne(query);
+            res.send(result);
+        });
+
+
 
         app.get("/classes/:email", async (req, res) => {
             const email = req.params.email;
@@ -119,6 +105,8 @@ async function run() {
             console.log(result);
             res.send(result);
         });
+
+
 
         app.get("/classes/:id", async (req, res) => {
             const id = req.params.id;
@@ -130,40 +118,42 @@ async function run() {
             res.send(data);
         });
 
-        app.patch('/classes/:id', async (req, res) => {
+
+
+        app.patch("/classes/:id", async (req, res) => {
             const id = req.params.id;
-            console.log(id);
+            // console.log(id);
+            const user = req.body;
             const filter = { _id: new ObjectId(id) };
             const updateDoc = {
-                $set: {
-                    status: 'approved'
-                },
+                $set: user,
             };
 
             const result = await classesCollection.updateOne(filter, updateDoc);
             res.send(result);
+        });
 
-        })
 
-        // Save a class in the database
-        app.post('/classes', async (req, res) => {
-            const classData = req.body
-            console.log(classData)
-            const result = await classesCollection.insertOne(classData)
-            res.send(result)
-        })
+
+        app.post("/classes", async (req, res) => {
+            const classData = req.body;
+            console.log(classData);
+            const result = await classesCollection.insertOne(classData);
+            res.send(result);
+        });
 
 
 
 
         // create a collection with bookings
 
+        // Get all bookings
         app.get("/bookings", async (req, res) => {
             const result = await bookingsCollection.find({}).toArray();
             res.send(result);
         });
 
-        
+        // Get bookings for guest
         app.get("/bookings/:email", async (req, res) => {
             const email = req.params.email;
             const query = { studentEmail: email };
@@ -172,7 +162,21 @@ async function run() {
             res.send(result);
         });
 
-        
+        //update payment status
+        app.patch("/bookings/:id", async (req, res) => {
+            const id = req.params.id;
+            // console.log(id);
+            const user = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: user,
+            };
+
+            const result = await bookingsCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        });
+
+        // Save a booking in database
         app.post("/bookings", async (req, res) => {
             const booking = req.body;
             console.log(booking);
@@ -180,13 +184,20 @@ async function run() {
             res.send(result);
         });
 
-        
+
 
         app.delete("/bookings/:id", async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) };
-            const result = await bookingsCollection.deleteOne(query);
-            res.send(result);
+            try {
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) };
+                const result = await bookingsCollection.deleteOne(query);
+                res.send(result);
+            } catch (error) {
+                console.error("Error deleting booking:", error);
+                res.status(500).send("Error deleting booking");
+                // Handle the error here
+                // You can customize the error response or perform any necessary actions to handle the error.
+            }
         });
 
 
