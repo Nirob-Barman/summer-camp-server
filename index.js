@@ -37,9 +37,9 @@ async function run() {
         const bookingsCollection = client.db("campDb").collection("bookings");
 
 
-
-
         // create a collection of users
+
+
 
         app.put("/users/:email", async (req, res) => {
             const email = req.params.email;
@@ -49,28 +49,47 @@ async function run() {
             const updateDoc = {
                 $set: user,
             };
-            const result = await usersCollection.updateOne(query, updateDoc, options);
-            console.log(result);
-            res.send(result);
+
+            try {
+                const result = await usersCollection.updateOne(query, updateDoc, options);
+                console.log(result);
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error updating user");
+            }
         });
+
 
 
 
         app.get("/users/:email", async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
-            const result = await usersCollection.findOne(query);
-            console.log(result);
-            res.send(result);
+
+            try {
+                const result = await usersCollection.findOne(query);
+                console.log(result);
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error fetching user");
+            }
         });
+
 
 
 
         app.get("/users", async (req, res) => {
-            const user = usersCollection.find();
-            const result = await user.toArray();
-            res.send(result);
+            try {
+                const users = await usersCollection.find().toArray();
+                res.send(users);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error fetching users");
+            }
         });
+
 
 
 
@@ -81,42 +100,61 @@ async function run() {
 
 
         app.get("/classes", async (req, res) => {
-            const result = await classesCollection.find().toArray();
-            // const result = await classesCollection.find().sort({availableSeats: -1}).toArray();
-            res.send(result);
+            try {
+                const classes = await classesCollection.find().toArray();
+                res.send(classes);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error fetching classes");
+            }
         });
+
 
 
 
         app.delete("/classes/:id", async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) };
-            const result = await classesCollection.deleteOne(query);
-            res.send(result);
+            try {
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) };
+                const result = await classesCollection.deleteOne(query);
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error deleting class");
+            }
         });
+
 
 
 
         app.get("/classes/:email", async (req, res) => {
-            const email = req.params.email;
-            const query = { instructorEmail: email };
-            const result = await classesCollection.find(query).toArray();
+            try {
+                const email = req.params.email;
+                const query = { instructorEmail: email };
+                const result = await classesCollection.find(query).toArray();
 
-            console.log(result);
-            res.send(result);
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error retrieving classes");
+            }
         });
+
 
 
 
         app.get("/classes/:id", async (req, res) => {
-            const id = req.params.id;
-
-            const filter = { _id: new ObjectId(id) };
-
-            const data = await classesCollection.findOne(filter);
-
-            res.send(data);
+            try {
+                const id = req.params.id;
+                const filter = { _id: new ObjectId(id) };
+                const data = await classesCollection.findOne(filter);
+                res.send(data);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error retrieving class");
+            }
         });
+
 
 
 
@@ -147,22 +185,33 @@ async function run() {
 
         // create a collection with bookings
 
-    
         app.get("/bookings", async (req, res) => {
-            const result = await bookingsCollection.find({}).toArray();
-            res.send(result);
+            try {
+                const result = await bookingsCollection.find({}).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error retrieving bookings");
+            }
         });
 
-        
+
+
         app.get("/bookings/:email", async (req, res) => {
-            const email = req.params.email;
-            const query = { studentEmail: email };
+            try {
+                const email = req.params.email;
+                const query = { studentEmail: email };
 
-            const result = await bookingsCollection.find(query).toArray();
-            res.send(result);
+                const result = await bookingsCollection.find(query).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Error retrieving bookings");
+            }
         });
 
-        
+
+
         app.patch("/bookings/:id", async (req, res) => {
             const id = req.params.id;
             // console.log(id);
@@ -176,12 +225,21 @@ async function run() {
             res.send(result);
         });
 
-        
+
         app.post("/bookings", async (req, res) => {
             const booking = req.body;
             console.log(booking);
             const result = await bookingsCollection.insertOne(booking);
             res.send(result);
+        });
+
+
+
+        app.get("/bookings/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const data = await bookingsCollection.findOne(filter);
+            res.send(data);
         });
 
 
