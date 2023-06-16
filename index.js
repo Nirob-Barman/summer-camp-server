@@ -35,7 +35,7 @@ async function run() {
         // await client.connect();
 
         const usersCollection = client.db("campDb").collection("users");
-        const classCollection = client.db("campDb").collection("classes");
+        const classesCollection = client.db("campDb").collection("classes");
         const bookingsCollection = client.db("campDb").collection("bookings");
 
 
@@ -94,6 +94,8 @@ async function run() {
         });
 
 
+
+
         // create a collection with classes
 
         app.get('/classes', async (req, res) => {
@@ -111,7 +113,7 @@ async function run() {
 
         app.get('/classes/:email', async (req, res) => {
             const email = req.params.email
-            const query = { 'instructorEmail': email }
+            const query = { 'InstructorEmail': email }
             const result = await classesCollection.find(query).toArray()
 
             console.log(result)
@@ -143,13 +145,50 @@ async function run() {
 
         })
 
-        // Save a class in database
+        // Save a class in the database
         app.post('/classes', async (req, res) => {
             const classData = req.body
             console.log(classData)
             const result = await classesCollection.insertOne(classData)
             res.send(result)
         })
+
+
+
+
+        // create a collection with bookings
+
+        app.get("/bookings", async (req, res) => {
+            const result = await bookingsCollection.find({}).toArray();
+            res.send(result);
+        });
+
+        
+        app.get("/bookings/:email", async (req, res) => {
+            const email = req.params.email;
+            const query = { studentEmail: email };
+
+            const result = await bookingsCollection.find(query).toArray();
+            res.send(result);
+        });
+
+        
+        app.post("/bookings", async (req, res) => {
+            const booking = req.body;
+            console.log(booking);
+            const result = await bookingsCollection.insertOne(booking);
+            res.send(result);
+        });
+
+        
+
+        app.delete("/bookings/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await bookingsCollection.deleteOne(query);
+            res.send(result);
+        });
+
 
 
         // Send a ping to confirm a successful connection
