@@ -147,13 +147,13 @@ async function run() {
 
         // create a collection with bookings
 
-        // Get all bookings
+    
         app.get("/bookings", async (req, res) => {
             const result = await bookingsCollection.find({}).toArray();
             res.send(result);
         });
 
-        // Get bookings for guest
+        
         app.get("/bookings/:email", async (req, res) => {
             const email = req.params.email;
             const query = { studentEmail: email };
@@ -162,7 +162,7 @@ async function run() {
             res.send(result);
         });
 
-        //update payment status
+        
         app.patch("/bookings/:id", async (req, res) => {
             const id = req.params.id;
             // console.log(id);
@@ -176,7 +176,7 @@ async function run() {
             res.send(result);
         });
 
-        // Save a booking in database
+        
         app.post("/bookings", async (req, res) => {
             const booking = req.body;
             console.log(booking);
